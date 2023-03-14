@@ -307,4 +307,215 @@ FROM Customers A, Customers B
 WHERE A.CustomerID <> B.CustomerID
 AND A.City = B.City
 ORDER BY A.City;
+
+select * from
+customer as c1, customer as c2
+-- 36 records
+
+select c1.id as customer_id, c1.name as customer_name, c2.name as supervisor_name from
+customer as c1
+LEFT JOIN
+customer as c2
+ON
+c1.sup_id = c2.id
+-- 6 records
+~~~
+
+- UNION 
+    - Is used to combine the result-set of two or more SELECT statements
+    - Every SELECT statement within UNION must have the same number of columns
+    - The columns must also have similar data types
+    - The columns in every SELECT statement must also be in the same order
+    - The UNION operator selects only distinct values by default. To allow duplicate values, use UNION ALL
+
+- The following SQL statement returns the cities (only distinct values) from both the "Customers" and the "Suppliers" table
+~~~sql
+SELECT City FROM Customers
+UNION
+SELECT City FROM Suppliers
+ORDER BY City;
+~~~
+
+- The following SQL statement returns the cities (duplicate values also) from both the "Customers" and the "Suppliers" table
+~~~sql
+SELECT City FROM Customers
+UNION ALL
+SELECT City FROM Suppliers
+ORDER BY City;
+~~~
+
+- So, here we have created a temporary column named "Type", that list whether the contact person is a "Customer" or a "Supplier"
+~~~sql
+SELECT 'Customer' AS Type, ContactName, City, Country
+FROM Customers
+UNION
+SELECT 'Supplier', ContactName, City, Country
+FROM Suppliers
+~~~
+
+- GROUP BY: Groups rows that have the same values into summary rows
+~~~sql
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country;
+
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+ORDER BY COUNT(CustomerID);
+
+SELECT Shippers.ShipperName, COUNT(Orders.OrderID) AS NumberOfOrders FROM Orders
+LEFT JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID
+GROUP BY ShipperName;
+~~~
+
+- HAVING: HAVING clause was added to SQL because the WHERE keyword cannot be used with aggregate functions
+~~~sql
+-- The following SQL statement lists the number of customers in each country. Only include countries with more than 5 customers
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+HAVING COUNT(CustomerID) < 5;
+
+-- The following SQL statement lists the number of customers in each country, sorted high to low (Only include countries with more than 5 customers)
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+HAVING COUNT(CustomerID) > 5
+ORDER BY COUNT(CustomerID);
+
+-- The following SQL statement lists the employees that have registered more than 10 orders
+SELECT Employees.LastName, COUNT(Orders.OrderID) AS NumberOfOrders
+FROM (Orders
+INNER JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID)
+GROUP BY LastName
+HAVING COUNT(Orders.OrderID) > 10;
+
+-- The following SQL statement lists if the employees "Davolio" or "Fuller" have registered more than 25 orders
+SELECT Employees.LastName, COUNT(Orders.OrderID) AS NumberOfOrders
+FROM Orders
+INNER JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID
+WHERE LastName = 'Davolio' OR LastName = 'Fuller'
+GROUP BY LastName
+HAVING COUNT(Orders.OrderID) > 25;
+~~~
+
+- EXISTS
+    - The EXISTS operator is used to test for the existence of any record in a subquery
+    - The EXISTS operator returns TRUE if the subquery returns one or more records
+~~~sql
+-- The following SQL statement returns TRUE and lists the suppliers with a product price less than 20
+SELECT SupplierName
+FROM Suppliers
+WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price < 20);
+
+-- The following SQL statement returns TRUE and lists the suppliers with a product price equal to 22
+SELECT SupplierName
+FROM Suppliers
+WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price = 22);
+
+~~~
+    
+- SQL ANY
+    - Returns a boolean value as a result
+    - Returns TRUE if ANY of the sub query values meet the condition
+~~~sql
+SELECT ProductName
+FROM Products
+WHERE ProductID = ANY
+  (SELECT ProductID
+  FROM OrderDetails
+  WHERE Quantity = 10);
+
+SELECT ProductName
+FROM Products
+WHERE ProductID = ANY
+  (SELECT ProductID
+  FROM OrderDetails
+  WHERE Quantity > 1000);
+~~~
+        
+- SQL ALL
+    - Returns a boolean value as a result
+    - Returns TRUE if ALL of the sub query values meet the condition
+    - Is used with SELECT, WHERE and HAVING statements
+~~~sql
+-- The following SQL statement lists the ProductName if ALL the records in the OrderDetails table has Quantity equal to 10. This will of course return FALSE because the Quantity column has many different values (not only the value of 10)
+SELECT ProductName 
+FROM Products
+WHERE ProductID = ALL (SELECT ProductID FROM OrderDetails WHERE Quantity = 10);
+~~~
+
+- SELECT INTO: Statement copies data from one table into a new table
+~~~sql
+SELECT * INTO CustomersBackup
+FROM Customers;
+
+SELECT CustomerName, ContactName INTO CustomersBackup
+FROM Customers;
+
+SELECT Customers.CustomerName, Orders.OrderID
+INTO CustomersOrderBackup2017
+FROM Customers
+LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
+
+SELECT * INTO newtable
+FROM oldtable
+WHERE 1 = 0;
+~~~
+
+- INSERT INTO SELECT: 
+    - Statement copies data from one table and inserts it into another table
+    - Requires that the data types in source and target tables match
+
+~~~sql
+-- If the table is created with same schema then can insert values from source table to target table
+INSERT INTO customer_bk
+SELECT * FROM customer
+
+-- The following SQL statement copies "Suppliers" into "Customers" (the columns that are not filled with data, will contain NULL)
+INSERT INTO Customers (CustomerName, City, Country)
+SELECT SupplierName, City, Country FROM Suppliers;
+
+INSERT INTO Customers (CustomerName, ContactName, Address, City, PostalCode, Country)
+SELECT SupplierName, ContactName, Address, City, PostalCode, Country FROM Suppliers;
+~~~
+
+- CASE Expressions
+    - The CASE expression goes through conditions and returns a value when the first condition is met 
+    - So, once a condition is true, it will stop reading and return the result
+    - If no conditions are true, it returns the value in the ELSE clause
+    - If there is no ELSE part and no conditions are true, it returns NULL
+~~~sql
+CASE
+    WHEN condition1 THEN result1
+    WHEN condition2 THEN result2
+    WHEN conditionN THEN resultN
+    ELSE result
+END;
+
+SELECT  Quantity,
+CASE 
+WHEN Quantity = 10 THEN OrderID
+ELSE 'Quantity not equals to 10'
+END AS QuantityText
+FROM OrderDetails;
+
+SELECT CustomerName, City, Country FROM Customers
+ORDER BY (CASE
+WHEN City IS NULL THEN Country
+ELSE City
+END);
+~~~
+
+- IFNULL(): Function lets you return an alternative value if an expression is NULL
+~~~sql
+SELECT ProductName, UnitPrice * (UnitsInStock + IFNULL(UnitsOnOrder, 0))
+FROM Products;
+~~~
+
+- ISNULL(): Function lets you return an alternative value when an expression is NULL
+~~~sql
+SELECT ProductName, UnitPrice * (UnitsInStock + ISNULL(UnitsOnOrder, 0))
+FROM Products;
 ~~~
