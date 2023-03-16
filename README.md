@@ -519,3 +519,56 @@ FROM Products;
 SELECT ProductName, UnitPrice * (UnitsInStock + ISNULL(UnitsOnOrder, 0))
 FROM Products;
 ~~~
+
+# SQL DataBase
+
+- CREATE DATABASE
+~~~sql
+CREATE DATABASE testDB;
+SHOW DATABASES;
+~~~
+
+- DROP DATABASE
+~~~sql
+DROP DATABASE testDB;
+~~~
+
+- CREATE TABLE
+~~~sql
+CREATE TABLE Persons2
+(
+PersonID int,
+LastName varchar(255),
+FirstName varchar(255),
+Address varchar(255),
+City varchar(255)
+);
+
+CREATE TABLE TestTable AS
+SELECT customername, contactname
+FROM customers;
+~~~
+
+- DROP TABLE: Is used to drop an existing table in a database
+~~~sql
+DROP TABLE Shippers;
+~~~
+
+- TRUNCATE TABLE: Is used to delete the data inside a table, but not the table itself
+~~~sql
+TRUNCATE TABLE Persons;
+~~~
+
+- ALTER TABLE
+    - The ALTER TABLE statement is used to add, delete, or modify columns in an existing table
+    - The ALTER TABLE statement is also used to add and drop various constraints on an existing table
+~~~sql
+ALTER TABLE Customers
+ADD Email varchar(255);
+
+ALTER TABLE Customers
+DROP COLUMN Email;
+
+ALTER TABLE Customers
+RENAME COLUMN Email to WorkEmail;
+~~~
