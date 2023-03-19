@@ -572,3 +572,199 @@ DROP COLUMN Email;
 ALTER TABLE Customers
 RENAME COLUMN Email to WorkEmail;
 ~~~
+
+- SQL Constraints
+    - Constraints are used to limit the type of data that can go into a table. This ensures the accuracy and reliability of the data in the table. If there is any violation between the constraint and the data action, the action is aborted.
+~~~txt
+NOT NULL - Ensures that a column cannot have a NULL value
+UNIQUE - Ensures that all values in a column are different
+PRIMARY KEY - A combination of a NOT NULL and UNIQUE. Uniquely identifies each row in a table
+FOREIGN KEY - Prevents actions that would destroy links between tables
+CHECK - Ensures that the values in a column satisfies a specific condition
+DEFAULT - Sets a default value for a column if no value is specified
+CREATE INDEX - Used to create and retrieve data from the database very quickly
+~~~
+
+- NOT NULL
+~~~sql
+CREATE TABLE Persons (
+    Id int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255) NOT NULL,
+    Age int
+);
+
+ALTER TABLE Persons
+ALTER COLUMN Age int NOT NULL;
+~~~
+
+- UNIQUE
+    - The UNIQUE constraint ensures that all values in a column are different
+~~~sql
+CREATE TABLE Persons (
+    ID int NOT NULL UNIQUE,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int
+);
+
+ALTER TABLE Persons
+ADD UNIQUE (ID);
+
+ALTER TABLE Persons
+DROP CONSTRAINT UC_Person;
+~~~
+
+- PRIMARY
+    - Primary keys must contain UNIQUE values, and cannot contain NULL values
+~~~sql
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    PRIMARY KEY (ID)
+);
+
+ALTER TABLE Persons
+ADD PRIMARY KEY (ID);
+
+ALTER TABLE Persons
+ADD CONSTRAINT PK_Person PRIMARY KEY (ID,LastName);
+
+ALTER TABLE Persons
+DROP CONSTRAINT PK_Person;
+~~~
+
+- FOREIGN KEY
+~~~sql
+CREATE TABLE Orders (
+    OrderID int NOT NULL PRIMARY KEY,
+    OrderNumber int NOT NULL,
+    PersonID int FOREIGN KEY REFERENCES Persons(PersonID)
+);
+
+ALTER TABLE Orders
+ADD FOREIGN KEY (PersonID) REFERENCES Persons(PersonID);
+
+ALTER TABLE Orders
+DROP CONSTRAINT FK_PersonOrder;
+~~~
+
+- CHECK
+    - The CHECK constraint is used to limit the value range that can be placed in a column
+~~~sql
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int CHECK (Age>=18 && Age is not null)
+);
+
+ALTER TABLE Persons
+ADD CONSTRAINT CHK_PersonAge CHECK (Age>=18 AND City='Sandnes');
+
+ALTER TABLE Persons
+DROP CONSTRAINT CHK_PersonAge;
+~~~
+
+- DEFAULT
+~~~sql
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    City varchar(255) DEFAULT 'Sandnes'
+);
+
+ALTER TABLE Persons
+ALTER City SET DEFAULT 'Sandnes';
+
+ALTER TABLE Persons
+ALTER COLUMN City DROP DEFAULT;
+~~~
+
+- CREATE INDEX
+~~~sql
+CREATE INDEX idx_lastname
+ON Persons (LastName);
+
+ALTER TABLE Persons
+DROP INDEX idx_lastname;
+~~~
+
+- AUTO INCREMENT
+~~~sql
+CREATE TABLE Persons (
+    Personid int NOT NULL AUTO_INCREMENT,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    PRIMARY KEY (Personid)
+);
+~~~
+
+# UML
+- A Class consists of Attributes and Methods
+~~~txt
+________________
+     Animal
+________________
+-name: string
+-id: int
+-age: int
+________________
+-setName(): void
+-eat(): void
+________________
+~~~
+
+- Visibility
+    - \- Private: Cannot access by any class or subclass
+    - \+ Public: Can be access by any class or subclass
+    - \# Protected: Can be access by same class or subclass
+    - \~ Default: Can be access as long as their in the same package
+    
+- Relationship
+    - Inheritance
+        ![Diagram](resources/images/erd1.PNG "Diagram")
+        eg: Tortoise inherits all the attributes and methods from the animal class.(Arrow pointing to parent class)
+        
+    - Association
+        ![Diagram](resources/images/erd2.PNG "Diagram")
+        eg: Otter eats Sea urchin(regular arrow)
+        
+    - Aggregation
+        ![Diagram](resources/images/erd3.PNG "Diagram")
+        eg: Part can exist outside the whole. Tortoise pack is known as a Creep. Tortoise can be a part of Creep or it can be separate from the Creep.(Open Diamond)
+        
+    - Composition
+        ![Diagram](resources/images/erd4.PNG "Diagram")
+        eg: Part cannot exist outside the whole. Lobby or Bathroom can only be exist inside a Visitor Center(Close Diamond)
+        
+- Multiplicity
+    ![Diagram](resources/images/erd5.PNG "Diagram")
+    
+- UML Diagram
+    ![Diagram](resources/images/erd6.PNG "Diagram")
+    - System
+        - eg: System boundary: Banking App
+    - Actors
+        - eg: Outside the System boundary: Customer, Bank
+    - Use cases
+        - Starts with a verb followed by an action
+            - eg: Log in, Check Balance, Transfer funds
+    - Relationships
+        - Association
+            - eg: Draws a normal line
+        - Include
+            - eg: If a base case occurs the include use case happens as well(Dash line from base to include use case)
+        - Exclude
+            - eg: If a base case occurs the exclude use case might happen sometimes but not all the time(Dash line from exclude to base use case)
+        - Generalization(Inheritance)
+            - eg: You can pay from checking account or savings account(Arrow from child to parent)
+            ![Diagram](resources/images/erd7.PNG "Diagram")
+            
+- Sequence Diagram
+    
