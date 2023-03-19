@@ -784,3 +784,49 @@ ________________
     
     - ER Diagram
     ![Diagram](resources/images/erd12.PNG "Diagram")
+    
+~~~sql
+CREATE TABLE "Department" (
+  "departmentId" int,
+  "departmentName" varchar,
+  PRIMARY KEY ("departmentId")
+);
+
+CREATE TABLE "Course" (
+  "courseId" int,
+  "courseName" varchar,
+  PRIMARY KEY ("courseId")
+);
+
+CREATE TABLE "Student" (
+  "studentId" int,
+  "firstName" varchar,
+  "lastName" varchar,
+  "age" varchar,
+  "departmentId" int,
+  PRIMARY KEY ("studentId"),
+  CONSTRAINT "FK_Student.departmentId"
+    FOREIGN KEY ("departmentId")
+      REFERENCES "Department"("departmentId")
+);
+
+CREATE TABLE "StudentCourses" (
+  "studentId" int,
+  "courseId" int,
+  CONSTRAINT "FK_StudentCourses.courseId"
+    FOREIGN KEY ("courseId")
+      REFERENCES "Course"("courseId"),
+  CONSTRAINT "FK_StudentCourses.studentId"
+    FOREIGN KEY ("studentId")
+      REFERENCES "Student"("studentId")
+);
+
+CREATE TABLE "ParentsDetail" (
+  "parentsDetailId" int,
+  "fathersName" varchar,
+  "mothersName" varchar,
+  "address" varchar,
+  "studentId" int,
+  PRIMARY KEY ("parentsDetailId")
+);
+~~~
