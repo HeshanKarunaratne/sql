@@ -767,4 +767,20 @@ ________________
             ![Diagram](resources/images/erd7.PNG "Diagram")
             
 - Sequence Diagram
+    - ATM Transaction Process
+        - Actor - stick figures
+            - eg: Customer
+        - Objects - Boxes
+            - eg: ATM, Bank Server, Bank Account
+        ![Diagram](resources/images/erd8.PNG "Diagram")
+        ![Diagram](resources/images/erd9.PNG "Diagram")
+        
+- ERD
+    - Entities
+        - Attributes
+        - Cardinality
+            ![Diagram](resources/images/erd10.PNG "Diagram")
+    ![Diagram](resources/images/erd11.PNG "Diagram")
     
+    - ER Diagram
+    ![Diagram](resources/images/erd12.PNG "Diagram")
