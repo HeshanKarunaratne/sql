@@ -830,3 +830,39 @@ CREATE TABLE "ParentsDetail" (
   PRIMARY KEY ("parentsDetailId")
 );
 ~~~
+
+- SQL Questions
+~~~sql
+-- Find distinct department count
+SELECT COUNT(DISTINCT(D."departmentName")) FROM public."Department" AS D
+
+-- Find student count against department name 
+SELECT DISTINCT(D."departmentName") AS dep_name, COUNT(S."departmentId") AS num_of_students 
+FROM public."Department" AS D
+LEFT JOIN public."Student" AS S
+ON S."departmentId" = D."departmentId"
+GROUP BY D."departmentName"
+
+-- Total Savings of the students in CS department
+SELECT SUM(S."totalSavings") AS total_savings
+FROM public."Department" AS D
+LEFT JOIN public."Student" AS S
+ON S."departmentId" = D."departmentId"
+WHERE D."departmentName" = 'CS'
+
+-- Get mothers detials and home address for all the students
+SELECT S."firstName" AS student_name, P."mothersName" AS mother_name, P."address" AS home_address
+FROM public."Student" AS S
+LEFT JOIN public."ParentsDetail" AS P
+ON S."studentId" = P."studentId" 
+
+-- Find How many courses each student doing along with their names
+SELECT S."firstName" AS first_name,S."lastName" AS last_name , COUNT(C."courseName") AS num_of_courses 
+FROM public."StudentCourses" AS SC
+INNER JOIN public."Student" AS S ON 
+SC."studentId" = S."studentId"
+INNER JOIN public."Course" AS C ON
+SC."courseId" = C."courseId"
+GROUP BY S."studentId"
+ORDER BY num_of_courses 
+~~~
