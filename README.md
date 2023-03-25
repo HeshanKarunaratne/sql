@@ -850,7 +850,7 @@ LEFT JOIN public."Student" AS S
 ON S."departmentId" = D."departmentId"
 WHERE D."departmentName" = 'CS'
 
--- Get mothers detials and home address for all the students
+-- Get mothers details and home address for all the students
 SELECT S."firstName" AS student_name, P."mothersName" AS mother_name, P."address" AS home_address
 FROM public."Student" AS S
 LEFT JOIN public."ParentsDetail" AS P
