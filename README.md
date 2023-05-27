@@ -866,3 +866,102 @@ SC."courseId" = C."courseId"
 GROUP BY S."studentId"
 ORDER BY num_of_courses 
 ~~~
+
+- Inner Queries and Sub Queries
+
+1. Create and Add employees
+~~~sql
+CREATE TABLE public.employee (
+    emp_id bigint NOT NULL,
+    emp_name character varying,
+    dept_name character varying,
+    salary bigint
+);
+ALTER TABLE public.employee OWNER TO postgres;
+
+INSERT INTO public.employee (emp_id, emp_name, dept_name, salary) VALUES (101, 'Heshan', 'Admin', 4000);
+INSERT INTO public.employee (emp_id, emp_name, dept_name, salary) VALUES (102, 'Dilan', 'HR', 2000);
+INSERT INTO public.employee (emp_id, emp_name, dept_name, salary) VALUES (103, 'Shihan', 'HR', 5000);
+INSERT INTO public.employee (emp_id, emp_name, dept_name, salary) VALUES (104, 'Danu', 'IT', 10000);
+INSERT INTO public.employee (emp_id, emp_name, dept_name, salary) VALUES (105, 'Soosa', 'Finance', 1000);
+INSERT INTO public.employee (emp_id, emp_name, dept_name, salary) VALUES (106, 'Rohan', 'Finance', 20000);
+
+ALTER TABLE ONLY public.employee
+    ADD CONSTRAINT employee_pkey PRIMARY KEY (emp_id);
+~~~
+
+2. Find employees whose salary is greater than the avg salary of all employees
+~~~sql
+select * from employee where salary > (select avg(salary) from employee)
+
+select * from employee e
+join (select avg(salary) sal from employee) avg_sal
+on e.salary > avg_sal.sal
+~~~
+
+3. Find the employees who earn the highest salary in each department
+~~~sql
+select * 
+from employee
+where (dept_name, salary) in 
+(select dept_name, max(salary) max_sal 
+ from employee 
+ group by dept_name)
+~~~
+
+4. Create and add Departments
+~~~sql
+CREATE TABLE public.department (
+    dept_id bigint,
+    dept_name character varying NOT NULL,
+    location character varying
+);
+
+ALTER TABLE public.department OWNER TO postgres;
+
+INSERT INTO public.department (dept_id, dept_name, location) VALUES (1, 'Admin', 'India');
+INSERT INTO public.department (dept_id, dept_name, location) VALUES (2, 'HR', 'SL');
+INSERT INTO public.department (dept_id, dept_name, location) VALUES (3, 'Finance', 'SL');
+INSERT INTO public.department (dept_id, dept_name, location) VALUES (4, 'IT', 'India');
+INSERT INTO public.department (dept_id, dept_name, location) VALUES (5, 'Marketing', 'SL');
+
+ALTER TABLE ONLY public.department
+    ADD CONSTRAINT department_pkey PRIMARY KEY (dept_name);
+~~~
+
+5. Find department who do not have any employee
+~~~sql
+select dept_name 
+from department 
+where dept_name 
+not in (
+	select distinct dept_name 
+	from employee)
+~~~
+
+6. Find employees in each department who earns more than the average salary in that department
+~~~sql
+select * 
+from employee e
+join 
+(select dept_name, avg(salary) avg_sal
+from employee
+group by dept_name) d
+on e.dept_name = d.dept_name and e.salary > d.avg_sal
+~~~
+
+7. Fetch All employee details and add remarks to those employees who earns more than avg salary
+~~~sql
+select *, (case when salary > (select avg(salary) from employee)
+  then 'Higher than average'
+  else null
+  end) as remarks
+from employee
+
+select *, (case when salary > avg_sal.sal
+  then 'Higher than average'
+  else null
+  end) as remarks
+from employee
+cross join (select avg(salary) sal from employee) avg_sal
+~~~
